@@ -1,0 +1,33 @@
+version: "2"
+
+services:
+  tiles:
+    image: pauliusm/tilestache
+    ports: ["8080:8080"]
+    links: ["db"]
+    environment:
+      PGHOST: db
+    volumes:
+      - "./tiles.cfg:/etc/tilestache/tilestache.cfg"
+      - "./queries:/etc/tilestache/queries"
+      - "/var/tilestache/cache"
+
+  db:
+    image: kartoza/postgis:9.6-2.4
+    ports: ["5432:5432"]
+    environment:
+      POSTGRES_DBNAME: osm
+      POSTGRES_USER: osm
+      POSTGRES_PASS: osm
+      ALLOW_IP_RANGE: 172.17.0.0/8
+    volumes:
+      - ".:/src"
+      - "/var/lib/postgresql"
+
+
+  web:
+    image: nginx:alpine
+    ports: ["80:80"]
+    volumes:
+      - "./demo:/usr/share/nginx/html"
+
